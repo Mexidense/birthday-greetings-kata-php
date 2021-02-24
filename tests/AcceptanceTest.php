@@ -4,59 +4,55 @@ declare(strict_types=1);
 
 namespace Tests\BirthdayGreetingsKata;
 
-use BirthdayGreetingsKata\Application\BirthdayService;
+use BirthdayGreetingsKata\Application\SendBirthdayGreeting\SendBirthdayGreeting;
+use BirthdayGreetingsKata\Application\SendBirthdayGreeting\SendBirthdayGreetingService;
 use BirthdayGreetingsKata\Domain\Model\XDate;
-use GuzzleHttp\Client;
+use BirthdayGreetingsKata\Infrastructure\Notification\CallbackSendBirthdayGreetingMessenger;
+use BirthdayGreetingsKata\Infrastructure\Persistence\Csv\CsvEmployeeRepository;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Process\Process;
+use Swift_Message;
 
 class AcceptanceTest extends TestCase
 {
-    private const SMTP_HOST = '127.0.0.1';
-    private const SMTP_PORT = 1025;
+    private array $messagesSent;
+    private ?SendBirthdayGreetingService $service;
 
-    /**
-     * @var BirthdayService
-     */
-    private $service;
-
-    /** @before */
-    protected function startMailhog(): void
+    public function setUp(): void
     {
-        $whichDockerCompose = Process::fromShellCommandline('which docker-compose');
-        $whichDockerCompose->run();
+        $this->messagesSent = [];
+        $this->service = new SendBirthdayGreetingService(
+            new CsvEmployeeRepository(__DIR__ . '/resources/employee_data.txt'),
+            new CallbackSendBirthdayGreetingMessenger(function ($sendBirthdayGreeting) {
+                $message = new Swift_Message($sendBirthdayGreeting->subject());
+                $message
+                    ->setFrom(SendBirthdayGreeting::SENDER)
+                    ->setTo([$sendBirthdayGreeting->email()])
+                    ->setBody($sendBirthdayGreeting->body());
 
-        if ('' === $whichDockerCompose->getOutput()) {
-            $this->markTestSkipped('To run this test you should have docker-compose installed.');
-        }
-
-        Process::fromShellCommandline('docker stop $(docker ps -a)')->run();
-        Process::fromShellCommandline('docker-compose up -d')->run();
-
-        $this->service = new BirthdayService();
-    }
-
-    /** @after */
-    protected function stopMailhog(): void
-    {
-        (new Client())->delete('http://127.0.0.1:8025/api/v1/messages');
-        Process::fromShellCommandline('docker-compose stop')->run();
-        Process::fromShellCommandline('docker-compose rm -f')->run();
-    }
-
-    /**
-     * @test
-     */
-    public function willSendGreetings_whenItsSomebodysBirthday(): void
-    {
-        $this->service->sendGreetings(
-            __DIR__ . '/resources/employee_data.txt',
-            new XDate('2008/10/08'),
-            static::SMTP_HOST,
-            static::SMTP_PORT
+                $this->messagesSent[] = [
+                    'Content' => [
+                        'Body' => $message->getBody(),
+                        'Headers' => [
+                            'Subject' => array_values([$message->getSubject()]),
+                            'To' => array_keys($message->getTo()),
+                        ]
+                    ],
+                ];
+            })
         );
+    }
 
-        $messages = $this->messagesSent();
+    public function tearDown(): void
+    {
+        $this->service = null;
+        $this->messagesSent = [];
+    }
+
+    public function testWillSendGreetingsWhensSomebodyIsItsBirthday(): void
+    {
+        $this->service->sendGreetings(new XDate('2008/10/08'));
+
+        $messages = $this->messagesSent;
         $this->assertCount(1, $messages, 'message not sent?');
 
         $message = $messages[0];
@@ -66,23 +62,10 @@ class AcceptanceTest extends TestCase
         $this->assertEquals('john.doe@foobar.com', $message['Content']['Headers']['To'][0]);
     }
 
-    /**
-     * @test
-     */
-    public function willNotSendEmailsWhenNobodysBirthday(): void
+    public function testWillNotSendEmailsWhenNobodyIsItsBirthday(): void
     {
-        $this->service->sendGreetings(
-            __DIR__ . '/resources/employee_data.txt',
-            new XDate('2008/01/01'),
-            static::SMTP_HOST,
-            static::SMTP_PORT
-        );
+        $this->service->sendGreetings(new XDate('2008/01/01'));
 
-        $this->assertCount(0, $this->messagesSent(), 'what? messages?');
-    }
-
-    private function messagesSent(): array
-    {
-        return json_decode(file_get_contents('http://127.0.0.1:8025/api/v1/messages'), true);
+        $this->assertCount(0, $this->messagesSent, 'what? messages?');
     }
 }
