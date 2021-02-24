@@ -6,5 +6,5 @@ namespace BirthdayGreetingsKata\Domain\Model;
 
 interface EmployeeRepository
 {
-    public function findAllEmployeesWhoBirthdayIs(XDate $xDate);
+    public function findAllEmployeesWhoBirthdayIs(XDate $xDate): array;
 }

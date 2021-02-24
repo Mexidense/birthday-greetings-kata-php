@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace BirthdayGreetingsKata\Infrastructure\Csv;
+namespace BirthdayGreetingsKata\Infrastructure\Persistence\Csv;
 
 use BirthdayGreetingsKata\Domain\Model\Employee;
 use BirthdayGreetingsKata\Domain\Model\EmployeeRepository;
 use BirthdayGreetingsKata\Domain\Model\XDate;
 
-final class EmployeeRepositoryUsingCsv implements EmployeeRepository
+final class CsvEmployeeRepository implements EmployeeRepository
 {
     private string $filename;
 
