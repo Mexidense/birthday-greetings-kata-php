@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace BirthdayGreetingsKata;
+namespace BirthdayGreetingsKata\Application;
 
+use BirthdayGreetingsKata\Domain\Model\Employee;
+use BirthdayGreetingsKata\Domain\Model\XDate;
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;

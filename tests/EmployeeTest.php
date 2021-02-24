@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests\BirthdayGreetingsKata;
 
-use BirthdayGreetingsKata\Employee;
-use BirthdayGreetingsKata\XDate;
+use BirthdayGreetingsKata\Domain\Model\Employee;
+use BirthdayGreetingsKata\Domain\Model\XDate;
 use PHPUnit\Framework\TestCase;
 
 class EmployeeTest extends TestCase
