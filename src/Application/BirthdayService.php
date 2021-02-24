@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace BirthdayGreetingsKata\Application;
 
-use BirthdayGreetingsKata\Domain\Model\Employee;
+use BirthdayGreetingsKata\Domain\Model\EmployeeRepository;
 use BirthdayGreetingsKata\Domain\Model\XDate;
 use Swift_Mailer;
 use Swift_Message;
@@ -12,21 +12,28 @@ use Swift_SmtpTransport;
 
 final class BirthdayService
 {
+    private EmployeeRepository $employeeRepository;
+
+    public function __construct(EmployeeRepository $employeeRepository)
+    {
+        $this->employeeRepository = $employeeRepository;
+    }
+
     public function sendGreetings($fileName, XDate $xDate, $smtpHost, $smtpPort): void
     {
-        $fileHandler = fopen($fileName, 'r');
-        fgetcsv($fileHandler);
-
-        while ($employeeData = fgetcsv($fileHandler, null, ',')) {
-            $employeeData = array_map('trim', $employeeData);
-            $employee = new Employee($employeeData[1], $employeeData[0], $employeeData[2], $employeeData[3]);
-            if ($employee->isBirthday($xDate)) {
-                $recipient = $employee->getEmail();
-                $body = sprintf('Happy Birthday, dear %s!', $employee->getFirstName());
-                $subject = 'Happy Birthday!';
-                $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $subject, $body, $recipient);
-            }
-        }
+        //$fileHandler = fopen($fileName, 'r');
+        //fgetcsv($fileHandler);
+        //
+        //while ($employeeData = fgetcsv($fileHandler, null, ',')) {
+        //    $employeeData = array_map('trim', $employeeData);
+        //    $employee = new Employee($employeeData[1], $employeeData[0], $employeeData[2], $employeeData[3]);
+        //    if ($employee->isBirthday($xDate)) {
+        //        $recipient = $employee->getEmail();
+        //        $body = sprintf('Happy Birthday, dear %s!', $employee->getFirstName());
+        //        $subject = 'Happy Birthday!';
+        //        $this->sendMessage($smtpHost, $smtpPort, 'sender@here.com', $subject, $body, $recipient);
+        //    }
+        //}
     }
 
     private function sendMessage($smtpHost, $smtpPort, $sender, $subject, $body, $recipient): void
