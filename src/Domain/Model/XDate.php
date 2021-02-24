@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace BirthdayGreetingsKata\Domain\Model;
 
-class XDate
+use DateTime;
+
+final class XDate
 {
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     private $date;
 
     public function __construct($yyyyMMdd)
     {
-        $this->date = \DateTime::createFromFormat('Y/m/d', $yyyyMMdd);
+        $this->date = DateTime::createFromFormat('Y/m/d', $yyyyMMdd);
     }
 
     public function getDay(): int
