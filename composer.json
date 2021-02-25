@@ -5,6 +5,7 @@
     "keywords": ["kata", "practice", "coding dojo", "dojo", "birthday", "birthday-kata"],
     "require": {
         "ext-json": "*",
+        "php": "^7.4|^8.0",
         "swiftmailer/swiftmailer": "^6.1"
     },
     "require-dev": {
