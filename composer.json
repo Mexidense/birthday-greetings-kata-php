@@ -33,5 +33,5 @@
             "Tests\\BirthdayGreetingsKata\\": "tests/"
         }
     },
-    "bin": ["src/main.php"]
+    "bin": ["src/app.php"]
 }
