@@ -8,7 +8,7 @@ use BirthdayGreetingsKata\Application\SendBirthdayGreeting\SendBirthdayGreeting;
 use BirthdayGreetingsKata\Application\SendBirthdayGreeting\SendBirthdayGreetingService;
 use BirthdayGreetingsKata\Domain\Model\XDate;
 use BirthdayGreetingsKata\Infrastructure\Notification\CallbackSendBirthdayGreetingMessenger;
-use BirthdayGreetingsKata\Infrastructure\Persistence\Csv\CsvEmployeeRepository;
+use BirthdayGreetingsKata\Infrastructure\Persistence\InMemory\InMemoryEmployeeRepository;
 use PHPUnit\Framework\TestCase;
 use Swift_Message;
 
@@ -21,7 +21,7 @@ class AcceptanceTest extends TestCase
     {
         $this->messagesSent = [];
         $this->service = new SendBirthdayGreetingService(
-            new CsvEmployeeRepository(__DIR__ . '/resources/employee_data.txt'),
+            new InMemoryEmployeeRepository(),
             new CallbackSendBirthdayGreetingMessenger(function ($sendBirthdayGreeting) {
                 $message = new Swift_Message($sendBirthdayGreeting->subject());
                 $message
