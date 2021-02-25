@@ -8,10 +8,7 @@ use DateTime;
 
 final class XDate
 {
-    /**
-     * @var DateTime
-     */
-    private $date;
+    private DateTime $date;
 
     public function __construct($yyyyMMdd)
     {

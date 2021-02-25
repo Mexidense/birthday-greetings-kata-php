@@ -6,25 +6,10 @@ namespace BirthdayGreetingsKata\Domain\Model;
 
 final class Employee
 {
-    /**
-     * @var XDate
-     */
-    private $birthDate;
-
-    /**
-     * @var string
-     */
-    private $lastName;
-
-    /**
-     * @var string
-     */
-    private $firstName;
-
-    /**
-     * @var string
-     */
-    private $email;
+    private XDate $birthDate;
+    private string $lastName;
+    private string $firstName;
+    private string $email;
 
     public function __construct($firstName, $lastName, $birthDate, $email)
     {
